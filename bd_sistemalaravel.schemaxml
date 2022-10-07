@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8" collation="utf8_general_ci">bd_sistemalaravel</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="detallepedido" view="standard">
+<left>815</left>
+<top>423</top>
+<width>218</width>
+<height>140</height>
+<sql_create_table>CREATE TABLE `detallepedido` (
+  `idpedido` int(10) unsigned NOT NULL,
+  `idproducto` int(10) unsigned NOT NULL,
+  `cantidad` int(10) unsigned NOT NULL,
+  `precio_venta` double unsigned NOT NULL,
+  PRIMARY KEY (`idpedido`,`idproducto`),
+  KEY `fk_detallepedido_producto` (`idproducto`),
+  CONSTRAINT `fk_detallepedido_pedido` FOREIGN KEY (`idpedido`) REFERENCES `pedido` (`idpedido`),
+  CONSTRAINT `fk_detallepedido_producto` FOREIGN KEY (`idproducto`) REFERENCES `producto` (`idproducto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="detalleventa" view="standard">
+<left>972</left>
+<top>218</top>
+<width>227</width>
+<height>140</height>
+<sql_create_table>CREATE TABLE `detalleventa` (
+  `idventa` int(10) unsigned NOT NULL,
+  `idproducto` int(10) unsigned NOT NULL,
+  `cantidad` int(10) unsigned NOT NULL,
+  `precio_venta` double unsigned NOT NULL,
+  KEY `fk_detalleventa_venta` (`idventa`),
+  KEY `fk_detalleventa_producto` (`idproducto`),
+  CONSTRAINT `fk_detalleventa_producto` FOREIGN KEY (`idproducto`) REFERENCES `producto` (`idproducto`),
+  CONSTRAINT `fk_detalleventa_venta` FOREIGN KEY (`idventa`) REFERENCES `venta` (`idventa`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="insumo" view="standard">
+<left>395</left>
+<top>345</top>
+<width>241</width>
+<height>140</height>
+<sql_create_table>CREATE TABLE `insumo` (
+  `idinsumo` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `cantidad` decimal(19,3) DEFAULT NULL,
+  `unidad_medida` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`idinsumo`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="insumo_producto" view="standard">
+<left>37</left>
+<top>431</top>
+<width>291</width>
+<height>123</height>
+<sql_create_table>CREATE TABLE `insumo_producto` (
+  `idproducto` int(10) unsigned NOT NULL,
+  `idinsumo` int(10) unsigned NOT NULL,
+  `cantidad_utilizada` decimal(19,3) unsigned DEFAULT NULL,
+  KEY `fk_insumoproducto_insumo` (`idinsumo`),
+  KEY `fk_insumoproducto_producto` (`idproducto`),
+  CONSTRAINT `fk_insumoproducto_insumo` FOREIGN KEY (`idinsumo`) REFERENCES `insumo` (`idinsumo`),
+  CONSTRAINT `fk_insumoproducto_producto` FOREIGN KEY (`idproducto`) REFERENCES `producto` (`idproducto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="pedido" view="standard">
+<left>1093</left>
+<top>394</top>
+<width>239</width>
+<height>202</height>
+<sql_create_table>CREATE TABLE `pedido` (
+  `idpedido` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `idmozo` int(10) unsigned NOT NULL,
+  `idmesa` int(10) unsigned NOT NULL,
+  `num_comanda` int(10) unsigned NOT NULL,
+  `fecha` datetime NOT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idpedido`),
+  KEY `fk_peido_colaborador` (`idmozo`),
+  KEY `fk_pedido_mesa` (`idmesa`),
+  CONSTRAINT `fk_pedido_mesa` FOREIGN KEY (`idmesa`) REFERENCES `mesa` (`idmesa`),
+  CONSTRAINT `fk_peido_colaborador` FOREIGN KEY (`idmozo`) REFERENCES `colaborador` (`idcolaborador`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="producto" view="standard">
+<left>395</left>
+<top>516</top>
+<width>219</width>
+<height>168</height>
+<sql_create_table>CREATE TABLE `producto` (
+  `idproducto` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `idcategoria` int(10) unsigned NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `precio` double unsigned NOT NULL,
+  `imagen` varchar(50) DEFAULT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idproducto`),
+  KEY `fk_producto_categoria` (`idcategoria`),
+  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`idcategoria`) REFERENCES `categoria` (`idcategoria`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="venta" view="standard">
+<left>1356</left>
+<top>9</top>
+<width>265</width>
+<height>223</height>
+<sql_create_table>CREATE TABLE `venta` (
+  `idventa` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `idpedido` int(10) unsigned NOT NULL,
+  `idusuario` int(10) unsigned DEFAULT NULL,
+  `idcliente` int(10) unsigned DEFAULT NULL,
+  `tipo_comprobante` varchar(20) DEFAULT NULL,
+  `serie_comprobante` varchar(10) DEFAULT NULL,
+  `num_comprobante` varchar(10) DEFAULT NULL,
+  `monto_total` double unsigned DEFAULT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idventa`),
+  KEY `fk_venta_pedido` (`idpedido`),
+  KEY `fk_venta_persona` (`idcliente`),
+  CONSTRAINT `fk_venta_pedido` FOREIGN KEY (`idpedido`) REFERENCES `pedido` (`idpedido`),
+  CONSTRAINT `fk_venta_persona` FOREIGN KEY (`idcliente`) REFERENCES `persona` (`idpersona`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="categoria" view="standard">
+<left>117</left>
+<top>618</top>
+<width>215</width>
+<height>129</height>
+<sql_create_table>CREATE TABLE `categoria` (
+  `idcategoria` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idcategoria`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="mesa" view="standard">
+<left>1357</left>
+<top>703</top>
+<width>214</width>
+<height>132</height>
+<sql_create_table>CREATE TABLE `mesa` (
+  `idmesa` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `num_mesa` varchar(50) NOT NULL,
+  `cant_per` int(11) DEFAULT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idmesa`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="colaborador" view="standard">
+<left>756</left>
+<top>608</top>
+<width>232</width>
+<height>244</height>
+<sql_create_table>CREATE TABLE `colaborador` (
+  `idcolaborador` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `idcargo` int(10) unsigned DEFAULT NULL,
+  `idturno` int(10) unsigned DEFAULT NULL,
+  `nickname` varchar(50) NOT NULL,
+  `nombres` varchar(50) NOT NULL,
+  `apellidos` varchar(50) NOT NULL,
+  `dni` varchar(8) NOT NULL,
+  `dirección` varchar(100) NOT NULL,
+  `telefono` varchar(9) DEFAULT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idcolaborador`),
+  KEY `fk_colaborador_cargo` (`idcargo`),
+  KEY `fk_colaborador_turno` (`idturno`),
+  CONSTRAINT `fk_colaborador_cargo` FOREIGN KEY (`idcargo`) REFERENCES `cargo` (`idcargo`),
+  CONSTRAINT `fk_colaborador_turno` FOREIGN KEY (`idturno`) REFERENCES `turno` (`idturno`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="persona" view="standard">
+<left>703</left>
+<top>61</top>
+<width>248</width>
+<height>220</height>
+<sql_create_table>CREATE TABLE `persona` (
+  `idpersona` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tipo_persona` varchar(50) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `tipo_documento` varchar(50) NOT NULL,
+  `num_documento` varchar(11) NOT NULL,
+  `direccion` varchar(50) DEFAULT NULL,
+  `telefono` varchar(9) DEFAULT NULL,
+  `f_nacimiento` date DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`idpersona`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="cargo" view="standard">
+<left>508</left>
+<top>709</top>
+<width>198</width>
+<height>119</height>
+<sql_create_table>CREATE TABLE `cargo` (
+  `idcargo` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `sueldo` double DEFAULT NULL,
+  PRIMARY KEY (`idcargo`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="turno" view="standard">
+<left>1032</left>
+<top>710</top>
+<width>219</width>
+<height>116</height>
+<sql_create_table>CREATE TABLE `turno` (
+  `idturno` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `hora_inicio` time DEFAULT NULL,
+  `hora_salida` time DEFAULT NULL,
+  PRIMARY KEY (`idturno`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="ingreso" view="standard">
+<left>359</left>
+<top>27</top>
+<width>255</width>
+<height>231</height>
+<sql_create_table>CREATE TABLE `ingreso` (
+  `idingreso` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `idusuario` int(10) unsigned DEFAULT NULL,
+  `idproveedor` int(10) unsigned DEFAULT NULL,
+  `tipo_comprobante` varchar(20) DEFAULT NULL,
+  `serie_comprobante` varchar(10) DEFAULT NULL,
+  `num_comprobante` varchar(10) DEFAULT NULL,
+  `fecha` datetime NOT NULL,
+  `monto_total` double unsigned NOT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idingreso`),
+  KEY `fk_ingreso_persona` (`idproveedor`),
+  CONSTRAINT `fk_ingreso_persona` FOREIGN KEY (`idproveedor`) REFERENCES `persona` (`idpersona`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="detalleingreso" view="standard">
+<left>42</left>
+<top>185</top>
+<width>262</width>
+<height>146</height>
+<sql_create_table>CREATE TABLE `detalleingreso` (
+  `idingreso` int(10) unsigned DEFAULT NULL,
+  `idinsumo` int(10) unsigned DEFAULT NULL,
+  `cantidad` decimal(19,3) unsigned DEFAULT NULL,
+  `precio_compra` double unsigned DEFAULT NULL,
+  KEY `fk_detalleingreso_ingreso` (`idingreso`),
+  KEY `fk_detalleingreso_insumo` (`idinsumo`),
+  CONSTRAINT `fk_detalleingreso_ingreso` FOREIGN KEY (`idingreso`) REFERENCES `ingreso` (`idingreso`),
+  CONSTRAINT `fk_detalleingreso_insumo` FOREIGN KEY (`idinsumo`) REFERENCES `insumo` (`idinsumo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="gasto" view="standard">
+<left>1433</left>
+<top>473</top>
+<width>188</width>
+<height>197</height>
+<sql_create_table>CREATE TABLE `gasto` (
+  `idgasto` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `fecha` datetime NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `cantidad` decimal(19,3) NOT NULL,
+  `costo` double NOT NULL,
+  `detalle` varchar(100) DEFAULT NULL,
+  `estado` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`idgasto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="usuario" view="standard">
+<left>1431</left>
+<top>291</top>
+<width>202</width>
+<height>146</height>
+<sql_create_table>CREATE TABLE `usuario` (
+  `idusuario` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  PRIMARY KEY (`idusuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>

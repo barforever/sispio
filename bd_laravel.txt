@@ -1,0 +1,75 @@
+CREATE TABLE `bd_laravel`.`categoria`(  
+  `idcategoria` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idcategoria`)
+);
+
+CREATE TABLE `bd_laravel`.`producto`(  
+  `idproducto` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idcategoria` INT(10) UNSIGNED NOT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `precio` DOUBLE UNSIGNED NOT NULL,
+  `stock` INT(11) UNSIGNED,
+  `cantpollo` DOUBLE UNSIGNED,
+  `imagen` VARCHAR(50),
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idproducto`),
+  CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`idcategoria`) REFERENCES `bd_laravel`.`categoria`(`idcategoria`)
+);
+
+CREATE TABLE `bd_laravel`.`rol`(  
+  `idrol` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`idrol`)
+);
+
+CREATE TABLE `bd_laravel`.`usuario`(  
+  `idusuario` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idrol` INT(10) UNSIGNED NOT NULL,
+  `usuario` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(50) NOT NULL,
+  `nombres` VARCHAR(50) NOT NULL,
+  `apellidos` VARCHAR(50) NOT NULL,
+  `telefono` VARCHAR(9),
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idusuario`),
+  CONSTRAINT `fk_usuario_rol` FOREIGN KEY (`idrol`) REFERENCES `bd_laravel`.`rol`(`idrol`)
+);
+
+CREATE TABLE `bd_laravel`.`mozo`(  
+  `idmozo` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `mozo` VARCHAR(50) NOT NULL,
+  `nombres` VARCHAR(50) NOT NULL,
+  `apellidos` VARCHAR(50) NOT NULL,
+  `telefono` VARCHAR(9),
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idmozo`)
+);
+
+CREATE TABLE `bd_laravel`.`venta`(  
+  `idventa` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idusuario` INT(10) UNSIGNED,
+  `idmozo` INT(10) UNSIGNED NOT NULL,
+  `fecha` DATETIME NOT NULL,
+  `num_venta` INT(10) NOT NULL,
+  `monto_total` DOUBLE UNSIGNED NOT NULL,
+  `mesa` INT(10) UNSIGNED NOT NULL,
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idventa`),
+  CONSTRAINT `fk_venta_usuario` FOREIGN KEY (`idusuario`) REFERENCES `bd_laravel`.`usuario`(`idusuario`),
+  CONSTRAINT `fk_venta_mozo` FOREIGN KEY (`idmozo`) REFERENCES `bd_laravel`.`mozo`(`idmozo`)
+);
+
+CREATE TABLE `bd_laravel`.`detalleventa`(  
+  `iddetalleventa` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idventa` INT(11) UNSIGNED NOT NULL,
+  `idproducto` INT(11) UNSIGNED NOT NULL,
+  `cantidad` INT(11) UNSIGNED NOT NULL,
+  `precio_venta` DOUBLE UNSIGNED NOT NULL,
+  PRIMARY KEY (`iddetalleventa`),
+  CONSTRAINT `fk_detalleventa_venta` FOREIGN KEY (`idventa`) REFERENCES `bd_laravel`.`venta`(`idventa`),
+  CONSTRAINT `fk_detalleventa_producto` FOREIGN KEY (`idproducto`) REFERENCES `bd_laravel`.`producto`(`idproducto`)
+);
+
+SELECT MAX(num_venta) FROM venta

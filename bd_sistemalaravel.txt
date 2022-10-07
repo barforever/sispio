@@ -1,0 +1,266 @@
+
+CREATE TABLE `categoria`(  
+  `idcategoria` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idcategoria`)
+);
+
+CREATE TABLE `producto`(  
+  `idproducto` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idcategoria` INT(10) UNSIGNED NOT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `precio` DOUBLE UNSIGNED NOT NULL,
+  `imagen` VARCHAR(50),
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idproducto`),
+  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`idcategoria`) REFERENCES `categoria`(`idcategoria`)
+);
+
+CREATE TABLE `insumo`(  
+  `idinsumo` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `cantidad` DECIMAL(19,3),
+  `unidad_medida` VARCHAR(50),
+  PRIMARY KEY (`idinsumo`)
+);
+
+CREATE TABLE `insumo_producto`(  
+  `idproducto` INT(10) UNSIGNED NOT NULL,
+  `idinsumo` INT(10) UNSIGNED NOT NULL,
+  `cantidad_utilizada` DECIMAL(19,3) UNSIGNED,
+  CONSTRAINT `fk_insumoproducto_insumo` FOREIGN KEY (`idinsumo`) REFERENCES `insumo`(`idinsumo`),
+  CONSTRAINT `fk_insumoproducto_producto` FOREIGN KEY (`idproducto`) REFERENCES `producto`(`idproducto`)
+);
+
+CREATE TABLE `mesa`(  
+  `idmesa` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `num_mesa` VARCHAR(50) NOT NULL,
+  `cant_per` INT,
+  `estado` VARCHAR(1),  
+  PRIMARY KEY (`idmesa`)
+);
+
+CREATE TABLE `cargo`(  
+  `idcargo` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `sueldo` DOUBLE,
+  PRIMARY KEY (`idcargo`)
+);
+
+CREATE TABLE `turno`(  
+  `idturno` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `hora_inicio` TIME,
+  `hora_salida` TIME,
+  PRIMARY KEY (`idturno`)
+);
+
+CREATE TABLE `colaborador`(  
+  `idcolaborador` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idcargo` INT(10) UNSIGNED,
+  `idturno` INT(10) UNSIGNED,
+  `nickname` VARCHAR(50) NOT NULL,
+  `nombres` VARCHAR(50) NOT NULL,
+  `apellidos` VARCHAR(50) NOT NULL,
+  `dni` VARCHAR(8) NOT NULL,
+  `direccion` VARCHAR(100) NOT NULL,
+  `telefono` VARCHAR(9),
+  `estado` VARCHAR(1), 
+  PRIMARY KEY (`idcolaborador`),
+  CONSTRAINT `fk_colaborador_cargo` FOREIGN KEY (`idcargo`) REFERENCES `cargo`(`idcargo`),
+  CONSTRAINT `fk_colaborador_turno` FOREIGN KEY (`idturno`) REFERENCES `turno`(`idturno`)
+);
+
+CREATE TABLE `persona`(  
+  `idpersona` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `tipo_persona` VARCHAR(50) NOT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `tipo_documento` VARCHAR(50) NOT NULL,
+  `num_documento` VARCHAR(11) NOT NULL,
+  `direccion` VARCHAR(50),
+  `telefono` VARCHAR(9),
+  `f_nacimiento` DATE,
+  `email` VARCHAR(50),
+  PRIMARY KEY (`idpersona`)
+);
+
+CREATE TABLE `usuario`(  
+  `idusuario` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(50) NOT NULL,
+  `email` VARCHAR(50),
+  `password` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`idusuario`)
+);
+
+CREATE TABLE `pedido`(  
+  `idpedido` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idmozo` INT(10) UNSIGNED NOT NULL,
+  `idmesa` INT(10) UNSIGNED NOT NULL,
+  `num_comanda` INT(10) UNSIGNED NOT NULL,
+  `fecha` DATETIME NOT NULL,
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idpedido`),
+  CONSTRAINT `fk_peido_colaborador` FOREIGN KEY (`idmozo`) REFERENCES `colaborador`(`idcolaborador`),
+  CONSTRAINT `fk_pedido_mesa` FOREIGN KEY (`idmesa`) REFERENCES `mesa`(`idmesa`)
+);
+
+CREATE TABLE `detallepedido`(  
+  `idpedido` INT(10) UNSIGNED NOT NULL,
+  `idproducto` INT(10) UNSIGNED NOT NULL,
+  `cantidad` INT(10) UNSIGNED NOT NULL,
+  `precio_venta` DOUBLE UNSIGNED NOT NULL,
+  PRIMARY KEY (`idpedido`,`idproducto`),
+  CONSTRAINT `fk_detallepedido_pedido` FOREIGN KEY (`idpedido`) REFERENCES `pedido`(`idpedido`),
+  CONSTRAINT `fk_detallepedido_producto` FOREIGN KEY (`idproducto`) REFERENCES `producto`(`idproducto`)
+);
+
+CREATE TABLE `venta`(  
+  `idventa` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idpedido` INT(10) UNSIGNED NOT NULL,
+  `idusuario` INT(10) UNSIGNED,
+  `idcliente` INT(10) UNSIGNED,
+  `tipo_comprobante` VARCHAR(20),
+  `serie_comprobante` VARCHAR(10),
+  `num_comprobante` VARCHAR(10),
+  `monto_total` DOUBLE UNSIGNED,
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idventa`),
+  CONSTRAINT `fk_venta_pedido` FOREIGN KEY (`idpedido`) REFERENCES `pedido`(`idpedido`),
+  CONSTRAINT `fk_venta_persona` FOREIGN KEY (`idcliente`) REFERENCES `persona`(`idpersona`)
+);
+
+CREATE TABLE `detalleventa`(  
+  `idventa` INT(10) UNSIGNED NOT NULL,
+  `idproducto` INT(10) UNSIGNED NOT NULL,
+  `cantidad` INT(10) UNSIGNED NOT NULL,
+  `precio_venta` DOUBLE UNSIGNED NOT NULL,
+  CONSTRAINT `fk_detalleventa_venta` FOREIGN KEY (`idventa`) REFERENCES `venta`(`idventa`),
+  CONSTRAINT `fk_detalleventa_producto` FOREIGN KEY (`idproducto`) REFERENCES `producto`(`idproducto`)
+);
+
+CREATE TABLE `ingreso`(  
+  `idingreso` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idusuario` INT(10) UNSIGNED,
+  `idproveedor` INT(10) UNSIGNED,
+  `tipo_comprobante` VARCHAR(20),
+  `serie_comprobante` VARCHAR(10),
+  `num_comprobante` VARCHAR(10),
+  `fecha` DATETIME NOT NULL,
+  `monto_total` DOUBLE UNSIGNED NOT NULL,
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idingreso`),
+  CONSTRAINT `fk_ingreso_persona` FOREIGN KEY (`idproveedor`) REFERENCES `persona`(`idpersona`)
+);
+
+CREATE TABLE `detalleingreso`(  
+  `idingreso` INT(10) UNSIGNED,
+  `idinsumo` INT(10) UNSIGNED,
+  `cantidad` DECIMAL(19,3) UNSIGNED,
+  `precio_compra` DOUBLE UNSIGNED,
+  CONSTRAINT `fk_detalleingreso_ingreso` FOREIGN KEY (`idingreso`) REFERENCES `ingreso`(`idingreso`),
+  CONSTRAINT `fk_detalleingreso_insumo` FOREIGN KEY (`idinsumo`) REFERENCES `insumo`(`idinsumo`)
+);
+
+CREATE TABLE `gasto`(  
+  `idgasto` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `fecha` DATETIME NOT NULL,
+  `nombre` VARCHAR(50) NOT NULL,
+  `cantidad` DECIMAL(19,3) NOT NULL,
+  `costo` DOUBLE NOT NULL,
+  `detalle` VARCHAR(100),
+  `estado` VARCHAR(1),
+  PRIMARY KEY (`idgasto`)
+);
+
+###########################################
+ACTUALIZA EL CAMPO DE UNA TABLA (insumo)
+##########################################
+UPDATE insumo AS i
+	INNER JOIN insumo_producto AS ip
+		ON i.`idinsumo` = ip.`idinsumo`
+	INNER JOIN detallepedido AS dp
+		ON dp.`idproducto` = ip.`idproducto`
+		
+SET i.`cantidad` = i.`cantidad` - dp.`cantidad` * ip.`cantidad_utilizada`;
+
+################################################################################
+CREA TRIGGER FUE EL PRIMER MODELO QUE SE CREO
+################################################################################
+DELIMITER //
+
+CREATE TRIGGER upd_stock AFTER INSERT 
+ON venta FOR EACH ROW 
+BEGIN
+  UPDATE 
+    insumo AS i 
+    INNER JOIN insumo_producto AS ip 
+      ON i.`idinsumo` = ip.`idinsumo` 
+    INNER JOIN detallepedido AS dp 
+      ON dp.`idproducto` = ip.`idproducto` SET i.`cantidad` = i.`cantidad` - dp.`cantidad` * ip.`cantidad_utilizada` 
+  WHERE dp.`idpedido` = NEW.`idpedido` ;
+END //
+
+DELIMITER ;
+
+#########################################################################
+CREA TRIGGER QUE INGRESA LOS DETALLES DEL PEDIDO A TABLA DETALLES VENTA
+#########################################################################
+DELIMITER //
+
+CREATE TRIGGER insertardetalleventa AFTER INSERT 
+ON venta FOR EACH ROW 
+BEGIN
+	INSERT INTO `detalleventa` (`idventa`,`idproducto`,`cantidad`,`precio_venta`)
+	SELECT	v.`idventa`,dp.`idproducto`,dp.`cantidad`,dp.`precio_venta`
+	FROM `venta` AS v
+		INNER JOIN `detallepedido` AS dp
+			ON v.`idpedido` = dp.`idpedido`
+	WHERE v.`idventa` = NEW.idventa;
+END //
+
+DELIMITER ;
+
+############################################################################
+DISMINUYE STOCK CUANDO REALIZAS UNA VENTA
+############################################################################
+DELIMITER //
+
+CREATE TRIGGER upd_down_stock AFTER INSERT 
+ON detalleventa FOR EACH ROW 
+BEGIN
+  UPDATE 
+    insumo AS i 
+    INNER JOIN insumo_producto AS ip 
+      ON i.`idinsumo` = ip.`idinsumo` 
+    INNER JOIN detallepedido AS dp 
+      ON ip.`idproducto` = dp.`idproducto`
+    INNER JOIN venta AS v
+      ON dp.`idpedido` = v.`idpedido` 
+      
+  SET i.`cantidad` = i.`cantidad` - ROUND(dp.`cantidad` * ip.`cantidad_utilizada`,3)
+  
+  WHERE ip.`idproducto` = NEW.`idproducto`;
+  
+END //
+
+DELIMITER ;
+
+############################################################################
+AUMENTA STOCK CUANDO REALIZAS UN INGRESO
+############################################################################
+DELIMITER //
+
+CREATE TRIGGER upd_up_stock AFTER INSERT 
+ON detalleingreso FOR EACH ROW 
+BEGIN
+  UPDATE 
+    insumo AS i SET i.`cantidad` = i.`cantidad` + NEW.`cantidad`
+  
+  WHERE i.`idinsumo` = NEW.`idinsumo`;
+  
+END //
+
+DELIMITER ;
+
+
+
